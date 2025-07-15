@@ -9,7 +9,6 @@ def get_env_default(key: str, default, cast_func):
 def main():
     parser = argparse.ArgumentParser(description="Ticket Purchase Tool or Gradio UI")
     subparsers = parser.add_subparsers(dest="command")
-    # `--buy` 子命令
     buy_parser = subparsers.add_parser("buy", help="Start the ticket buying ui")
     buy_parser.add_argument(
         "tickets_info_str", type=str, help="Ticket information in string format."
@@ -50,6 +49,18 @@ def main():
         help="ServerChan key (optional).",
     )
     buy_parser.add_argument(
+        "--serverchan3ApiUrl",
+        type=str,
+        default=os.environ.get("BTB_SERVERCHAN3APIURL", ""),
+        help="ServerChan3 API URL (optional).",
+    )
+    buy_parser.add_argument(
+        "--barkToken",
+        type=str,
+        default=os.environ.get("BTB_BARKTOKEN", ""),
+        help="Bark token (optional).",
+    )
+    buy_parser.add_argument(
         "--ntfy_url",
         type=str,
         default=os.environ.get("BTB_NTFY_URL", ""),
@@ -85,24 +96,10 @@ def main():
         default="网页",
         help="server name",
     )
-    # `--worker` 子命令
-    worker_parser = subparsers.add_parser("worker", help="Start the ticket worker ui")  # noqa: F841
-    worker_parser.add_argument(
-        "--master",
-        type=str,
-        default=os.environ.get("BTB_MASTER", ""),
-        help="master url, like http://127.0.0.1:7890",
-    )
-    worker_parser.add_argument(
-        "--self_ip",
-        type=str,
-        default=os.environ.get("BTB_SELF_IP", "127.0.0.1"),
-        help="the ip that master note can access, like 127.0.0.1",
-    )
-    worker_parser.add_argument(
-        "--https_proxys",
-        type=str,
-        default=os.environ.get("BTB_HTTPS_PROXYS", "none"),
+    buy_parser.add_argument(
+        "--hide_random_message",
+        action="store_true",
+        help="hide random message when fail",
     )
     parser.add_argument(
         "--port",
@@ -127,10 +124,6 @@ def main():
         from app_cmd.buy import buy_cmd
 
         buy_cmd(args=args)
-    elif args.command == "worker":
-        from app_cmd.worker import worker_cmd
-
-        worker_cmd(args=args)
     else:
         from app_cmd.ticker import ticker_cmd
 
